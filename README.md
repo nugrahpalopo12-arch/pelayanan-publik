@@ -1,30 +1,58 @@
-# Sistem Pelaporan Layanan (Service Reporting System)
+# Pelaporan Layanan Masyarakat
 
-Sistem Pelaporan Layanan adalah sebuah aplikasi berbasis web yang dibangun menggunakan **PHP Native** dan **MySQL**. Aplikasi ini dirancang untuk memfasilitasi pengguna dalam membuat, melacak, dan mengelola laporan atau pengaduan layanan.
+Solusi digital modern untuk meningkatkan responsivitas dan transparansi layanan publik.
 
-## 📋 Fitur Utama
+## 🚀 Pitch Deck
 
-* [cite_start]**Autentikasi Pengguna:** Sistem registrasi dan login yang aman untuk pengguna[cite: 14, 16, 25].
-* [cite_start]**Buat Laporan:** Pengguna dapat membuat laporan baru terkait masalah layanan[cite: 18].
-* [cite_start]**Daftar Laporan:** Melihat riwayat dan daftar laporan yang telah masuk[cite: 21].
-* [cite_start]**Update Status:** Fitur untuk memperbarui status laporan (misal: Pending, Sedang Diproses, Selesai)[cite: 23].
-* [cite_start]**Manajemen Upload:** Dukungan penyimpanan file/bukti laporan dalam folder `storage`[cite: 30].
-* [cite_start]**Desain Responsif:** Menggunakan CSS kustom untuk tampilan formulir dan laporan yang rapi[cite: 1, 8].
+**Masalah:**
+Masyarakat sering kesulitan melaporkan masalah infrastruktur atau layanan publik (jalan rusak, lampu mati, sampah menumpuk). Laporan manual lambat, tidak transparan, dan sulit dilacak.
 
-## 🛠️ Teknologi yang Digunakan
+**Solusi Kami:**
+**Pelaporan Layanan** adalah platform berbasis web yang memungkinkan warga melaporkan masalah secara real-time disertai dengan **lokasi presisi (Geo-tagging)** dan bukti foto.
 
-* **Bahasa Pemrograman:** PHP (Native)
-* **Database:** MySQL
-* **Frontend:** HTML5, CSS3, JavaScript
-* **Server:** Apache (XAMPP/WAMP/Laragon)
+**Value Proposition:**
+- **Mudah & Cepat:** Lapor dalam hitungan detik.
+- **Transparan:** Pantau status laporan (Baru -> Diproses -> Selesai).
+- **Akurat:** Integrasi peta memastikan petugas tahu lokasi tepat kejadian.
+- **Akuntabel:** Admin dapat mengelola dan menindaklanjuti laporan secara efisien.
+
+---
 
 ## 📂 Struktur Folder
 
-```text
+```
 Pelaporan-layanan/
-├── config/             # Konfigurasi database
-├── public/             # File yang dapat diakses publik (CSS, JS, PHP Pages)
-├── sql/                # Skema database (schema.sql)
-├── src/                # Logika backend (Auth, DB Connection, Functions)
-├── storage/            # Tempat penyimpanan file upload
+├── config/             # Konfigurasi database dan lingkungan
+├── public/             
+│   ├── css/            # Stylesheet (CSS)
+│   ├── uploads/        # Penyimpanan foto laporan
+│   ├── index.php       # Landing page / Redirect
+│   ├── report_create.php   # Form pembuatan laporan (+ Peta)
+│   ├── report_list.php     # Daftar laporan masyarakat
+│   ├── report_map.php      # [BARU] Visualisasi peta sebaran laporan
+│   └── ...             # File publik lainnya
+├── src/                
+│   ├── auth.php        # Helper otentikasi
+│   ├── db.php          # Koneksi database (PDO)
+│   └── functions.php   # Fungsi utilitas global
+├── sql/                # Skema database
 └── README.md           # Dokumentasi proyek
+```
+
+## 🛠 Tech Stack
+
+Aplikasi ini dibangun dengan teknologi yang handal, cepat, dan mudah dipelihara:
+
+- **Backend:** PHP Native (Modern PHP 8+)
+- **Database:** MySQL
+- **Frontend:** HTML5, CSS3 (Custom Responsive Design)
+- **Maps API:** OpenStreetMap & Leaflet.js (Gratis, Open Source, Ringan)
+- **Server:** Apache/Nginx (via Laragon/XAMPP)
+
+## 🌟 Fitur Baru: Integrasi Peta
+
+Kami baru saja menambahkan fitur **Geo-tagging**:
+1.  **Input Lokasi:** Pelapor dapat menandai lokasi kejadian langsung di peta saat membuat laporan.
+2.  **Visualisasi Data:** Halaman khusus `Peta Sebaran` untuk melihat titik-titik masalah di seluruh wilayah.
+3.  **Navigasi:** Integrasi langsung dengan Google Maps untuk memandu petugas ke lokasi.
+
