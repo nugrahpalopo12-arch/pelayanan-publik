@@ -52,9 +52,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $imgPath = rtrim($cfg['upload_url'], '/\\') . '/' . $fname;
   }
 
-  $stmt = $pdo->prepare('INSERT INTO reports (user_id, category_id, title, description, image_path, sla_deadline) VALUES (?, ?, ?, ?, ?, ?)');
+  $imgDesc = null; 
+  $lat = !empty($_POST['latitude']) ? $_POST['latitude'] : null;
+  $lng = !empty($_POST['longitude']) ? $_POST['longitude'] : null;
+
+  $stmt = $pdo->prepare('INSERT INTO reports (user_id, category_id, title, description, image_path, latitude, longitude, sla_deadline) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
   $sla = date('Y-m-d H:i:s', strtotime('+3 days'));
-  $stmt->execute([ $_SESSION['user']['id'], $cat, $title, $desc, $imgPath, $sla ]);
+  $stmt->execute([ $_SESSION['user']['id'], $cat, $title, $desc, $imgPath, $lat, $lng, $sla ]);
   flash_set('success','Laporan terkirim.');
   log_action($_SESSION['user']['id'], 'create_report', json_encode(['title'=>$title]));
   header('Location: report_list.php'); exit;
@@ -83,7 +87,46 @@ $token = csrf_token();
     </select>
   </label>
   <label>Deskripsi <textarea name="description" required></textarea></label>
+  <label>Lokasi Kejadian (Klik pada peta)
+    <div id="map" style="height: 300px; margin-bottom: 10px; border: 1px solid #ddd;"></div>
+    <input type="hidden" name="latitude" id="lat">
+    <input type="hidden" name="longitude" id="lng">
+  </label>
   <label>Gambar (opsional) <input type="file" name="image" accept="image/png,image/jpeg"></label>
   <button type="submit">Kirim</button>
 </form>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+  // Initialize map
+  var map = L.map('map').setView([-6.200000, 106.816666], 13); // Default Jakarta
+
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(map);
+
+  var marker;
+
+  function onMapClick(e) {
+      if (marker) {
+        map.removeLayer(marker);
+      }
+      marker = L.marker(e.latlng).addTo(map);
+      document.getElementById('lat').value = e.latlng.lat;
+      document.getElementById('lng').value = e.latlng.lng;
+  }
+
+  map.on('click', onMapClick);
+
+  // Try to get user location
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      var lat = position.coords.latitude;
+      var lng = position.coords.longitude;
+      map.setView([lat, lng], 15);
+    });
+  }
+</script>
 </body></html>

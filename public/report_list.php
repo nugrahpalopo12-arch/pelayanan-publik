@@ -37,19 +37,38 @@ $pages = (int)ceil($total / $per);
 <link rel="stylesheet" href="./css/report.css"></head>
 <body>
     <a class="back-btn" href="index.php">← Kembali</a>
-<form method="get" action="/report_list.php">
+<form method="get" action="report_list.php">
   <input name="q" value="<?= e($q) ?>" placeholder="Cari laporan...">
   <button>Search</button>
 </form>
 
+<div style="margin-bottom: 10px;">
+    <a href="report_map.php" style="background: #2196F3; color: white; padding: 8px 12px; text-decoration: none; border-radius: 4px;">Lihat Peta Sebaran</a>
+</div>
+
 <table>
-  <thead><tr><th>Judul</th><th>Pelapor</th><th>Kategori</th><th>Status</th><th>Waktu</th></tr></thead>
+  <thead><tr><th>Judul</th><th>Foto</th><th>Lokasi</th><th>Pelapor</th><th>Kategori</th><th>Status</th><th>Waktu</th></tr></thead>
   <tbody>
     <?php if (empty($rows)): ?>
       <tr><td colspan="5">Tidak ada laporan.</td></tr>
     <?php else: foreach($rows as $r): ?>
       <tr>
         <td><?= e($r['title']) ?></td>
+        <td>
+          <?php if (!empty($r['image_path'])): ?>
+            <img src="<?= e($r['image_path']) ?>" alt="Foto Laporan" style="max-width: 100px; height: auto; border-radius: 4px;">
+          <?php else: ?>
+            -
+          <?php endif; ?>
+        </td>
+        </td>
+        <td style="text-align:center;">
+            <?php if (!empty($r['latitude'])): ?>
+                <a href="https://www.google.com/maps?q=<?= $r['latitude'] ?>,<?= $r['longitude'] ?>" target="_blank" title="Lihat di Google Maps">📍</a>
+            <?php else: ?>
+                -
+            <?php endif; ?>
+        </td>
         <td><?= e($r['reporter']) ?></td>
         <td><?= e($r['category']) ?></td>
         <td>
