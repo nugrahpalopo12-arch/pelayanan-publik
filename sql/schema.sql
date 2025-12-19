@@ -21,7 +21,7 @@ CREATE TABLE categories (
   name VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE reports (
+CREATE TABLe reports (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
   category_id INT NULL,
