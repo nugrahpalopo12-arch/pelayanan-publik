@@ -1,40 +1,94 @@
 <?php
-if(session_status() === PHP_SESSION_NONE) session_start();
+declare(strict_types=1);
+
+/**
+ * --------------------------------------------------
+ * Bootstrap Session
+ * --------------------------------------------------
+ */
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 require_once __DIR__ . '/db.php';
 
-function flash_set($key, $msg) {
-  $_SESSION['flash'][$key] = $msg;
-}
-function flash_get($key) {
-  if(!empty($_SESSION['flash'][$key])) {
-    $m = $_SESSION['flash'][$key];
-    unset($_SESSION['flash'][$key]);
-    return $m;
-  }
-  return null;
+/**
+ * --------------------------------------------------
+ * Flash Message Helper
+ * --------------------------------------------------
+ */
+function flash_set(string $key, string $message): void
+{
+    $_SESSION['flash'][$key] = $message;
 }
 
-function e($s) {
-  return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+function flash_get(string $key): ?string
+{
+    if (!empty($_SESSION['flash'][$key])) {
+        $message = $_SESSION['flash'][$key];
+        unset($_SESSION['flash'][$key]);
+        return $message;
+    }
+    return null;
 }
 
-function csrf_token() {
-  if (empty($_SESSION['_csrf'])) {
-    $_SESSION['_csrf'] = bin2hex(random_bytes(16));
-  }
-  return $_SESSION['_csrf'];
-}
-function csrf_check($token) {
-  return isset($_SESSION['_csrf']) && hash_equals($_SESSION['_csrf'], $token ?? '');
+/**
+ * --------------------------------------------------
+ * Output Escaping (XSS Protection)
+ * --------------------------------------------------
+ */
+function e(mixed $value): string
+{
+    return htmlspecialchars(
+        (string) $value,
+        ENT_QUOTES | ENT_SUBSTITUTE,
+        'UTF-8'
+    );
 }
 
-function log_action($user_id, $action, $meta = null){
-  try {
-    $pdo = DB::get();
-    $stmt = $pdo->prepare("INSERT INTO activity_logs (user_id, action, meta) VALUES (?, ?, ?)");
-    $stmt->execute([$user_id, $action, $meta]);
-  } catch (Exception $ex) {
-    error_log("log_action error: ".$ex->getMessage());
-  }
+/**
+ * --------------------------------------------------
+ * CSRF Protection
+ * --------------------------------------------------
+ */
+function csrf_token(): string
+{
+    if (empty($_SESSION['_csrf'])) {
+        $_SESSION['_csrf'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['_csrf'];
 }
+
+function csrf_check(?string $token): bool
+{
+    return isset($_SESSION['_csrf'])
+        && hash_equals($_SESSION['_csrf'], (string) $token);
+}
+
+/**
+ * --------------------------------------------------
+ * Activity Logger
+ * --------------------------------------------------
+ */
+function log_action(
+    int $user_id,
+    string $action,
+    ?string $meta = null
+): void {
+    try {
+        $pdo = DB::get();
+        $stmt = $pdo->prepare(
+            "INSERT INTO activity_logs (user_id, action, meta)
+             VALUES (:user_id, :action, :meta)"
+        );
+
+        $stmt->execute([
+            ':user_id' => $user_id,
+            ':action'  => $action,
+            ':meta'    => $meta,
+        ]);
+    } catch (Throwable $e) {
+        error_log('[LOG_ACTION_ERROR] ' . $e->getMessage());
+    }
+}
+
