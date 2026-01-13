@@ -1,62 +1,65 @@
-<?php 
-require_once __DIR__ . '/../src/functions.php'; 
-$token = csrf_token(); 
-?>
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Daftar Akun - Pelaporan</title>
-  <link rel="stylesheet" href="./css/form.css">
-  <script>
-    function validateForm() {
-      const pass = document.getElementById("password").value;
-      const confirm = document.getElementById("confirm_password").value;
-      if (pass !== confirm) {
-        alert("Password tidak cocok!");
-        return false;
-      }
-      return true;
-    }
-  </script>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Daftar</title>
+  <link rel="stylesheet" href="./css/auth.css">
 </head>
-
 <body>
-
-<?php if ($m = flash_get('error')): ?>
-  <div class="alert error"><?= e($m) ?></div>
-<?php endif; ?>
-
-<?php if ($m = flash_get('success')): ?>
-  <div class="alert success"><?= e($m) ?></div>
-<?php endif; ?>
-
-<form method="POST" action="../src/process_register.php" onsubmit="return validateForm();">
-  <h2 style="text-align:center; margin-bottom:18px; color:#1e4c87;">Pendaftaran Akun</h2>
-
-  <input type="hidden" name="csrf_token" value="<?= e($token) ?>">
-
-  <label>Nama Lengkap
-    <input type="text" name="name" required>
-  </label>
-
-  <label>Email
-    <input type="email" name="email" required>
-  </label>
-
-  <label>Password
-    <input type="password" name="password" id="password" required minlength="6">
-  </label>
-
-  <label>Konfirmasi Password
-    <input type="password" id="confirm_password" required minlength="6">
-  </label>
-
-  <button type="submit">Daftar</button>
+<div class="auth-box">
+  <h2>Daftar Akun</h2>
+  <div id="alert" class="alert error" style="display:none;"></div>
+  
+  <form id="registerForm">
+    <label>Nama Lengkap <input type="text" name="name" required></label>
+    <label>Email <input type="email" name="email" required></label>
+    <label>Password <input type="password" name="password" required></label>
+    <button type="submit">Daftar</button>
+  </form>
 
   <p>Sudah punya akun? <a href="./login.php">Login</a></p>
-</form>
+  <p><a href="./index.php">Ke Beranda</a></p>
+</div>
 
+<script>
+document.getElementById('registerForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const alertBox = document.getElementById('alert');
+  const btn = e.target.querySelector('button');
+
+  alertBox.style.display = 'none';
+  btn.disabled = true;
+  btn.innerText = 'Loading...';
+
+  const formData = new FormData(this);
+  const data = Object.fromEntries(formData.entries());
+
+  try {
+    const res = await fetch('api/auth/register.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    const result = await res.json();
+    
+    if (res.ok) {
+        localStorage.setItem('token', result.token);
+        localStorage.setItem('user', JSON.stringify(result.user));
+        alert('Pendaftaran berhasil!');
+        window.location.href = 'index.php'; 
+    } else {
+        alertBox.innerText = result.error || 'Pendaftaran gagal';
+        alertBox.style.display = 'block';
+    }
+  } catch (err) {
+      alertBox.innerText = 'Terjadi kesalahan koneksi';
+      alertBox.style.display = 'block';
+  } finally {
+      btn.disabled = false;
+      btn.innerText = 'Daftar';
+  }
+});
+</script>
 </body>
 </html>

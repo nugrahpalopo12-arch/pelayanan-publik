@@ -1,5 +1,4 @@
 <?php
-// src/db.php
 class DB {
   private static $pdo = null;
   public static function get() {

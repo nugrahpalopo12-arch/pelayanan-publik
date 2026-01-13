@@ -21,13 +21,15 @@ CREATE TABLE categories (
   name VARCHAR(100) NOT NULL
 );
 
-CREATE TABLe reports (
+CREATE TABLE reports (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
   category_id INT NULL,
   title VARCHAR(255) NOT NULL,
   description TEXT NOT NULL,
   image_path VARCHAR(255) NULL,
+  latitude DECIMAL(10,8) NULL,
+  longitude DECIMAL(11,8) NULL,
   status ENUM('new','in_progress','resolved','rejected') DEFAULT 'new',
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NULL,
